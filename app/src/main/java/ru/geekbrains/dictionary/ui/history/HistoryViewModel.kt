@@ -1,14 +1,12 @@
-package ru.geekbrains.dictionary.ui
+package ru.geekbrains.dictionary.ui.history
 
 import androidx.lifecycle.LiveData
-import geekbrains.ru.translator.utils.parseSearchResults
-import kotlinx.coroutines.Dispatchers
+import geekbrains.ru.translator.utils.parseLocalSearchResults
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import ru.geekbrains.dictionary.data.AppState
+import ru.geekbrains.dictionary.ui.base.BaseViewModel
 
-
-class MainViewModel(private val interactor: MainInteractor) :
+class HistoryViewModel(private val interactor: HistoryInteractor) :
     BaseViewModel<AppState>() {
 
     private val liveDataForViewToObserve: LiveData<AppState> = _mutableLiveData
@@ -23,10 +21,9 @@ class MainViewModel(private val interactor: MainInteractor) :
         viewModelCoroutineScope.launch { startInteractor(word, isOnline) }
     }
 
-    private suspend fun startInteractor(word: String, isOnline: Boolean) =
-        withContext(Dispatchers.IO) {
-            _mutableLiveData.postValue(parseSearchResults(interactor.getData(word, isOnline)))
-        }
+    private suspend fun startInteractor(word: String, isOnline: Boolean) {
+        _mutableLiveData.postValue(parseLocalSearchResults(interactor.getData(word, isOnline)))
+    }
 
     override fun handleError(error: Throwable) {
         _mutableLiveData.postValue(AppState.Error(error))
